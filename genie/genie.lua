@@ -1,8 +1,8 @@
-local MIX_COMMON_DIR = path.getabsolute ("../../mix")
-local PROJECT_DIR = path.getabsolute ("../")
+MIX_DIR = path.getabsolute ("../../mix")
+PROJECT_DIR = path.getabsolute ("../")
 
 solution "mix_examples"
-	dofile (path.join (MIX_COMMON_DIR, "genie/setup.lua"))
+	dofile (path.join (MIX_DIR, "genie/setup.lua"))
 	
 	if mix_is_android() then
 		premake.gradle.appabi = {"armeabi", "armeabi-v7a", "x86"}
@@ -41,7 +41,7 @@ solution "mix_examples"
 			grd.manifest = path.join (PROJECT_DIR, "src/example_00/android/AndroidManifest.xml")
 			
 			grd.java_srcdirs = {
-				path.join (MIX_COMMON_DIR, "src/mix/android/app/java"),
+				path.join (MIX_DIR, "src/mix/android/app/java"),
 				path.join (PROJECT_DIR, "src/example_00/android/java")
 			}
 			
