@@ -41,7 +41,7 @@ solution "mix_examples"
 			grd.manifest = path.join (PROJECT_DIR, "src/android/AndroidManifest.xml")
 			
 			grd.java_srcdirs = {
-				path.join (MIX_COMMON_DIR, "src/android/app/java"),
+				path.join (MIX_COMMON_DIR, "src/mix/android/app/java"),
 				path.join (PROJECT_DIR, "src/android/java")
 			}
 			

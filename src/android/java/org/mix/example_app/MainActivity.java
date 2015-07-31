@@ -9,7 +9,7 @@ public class MainActivity extends org.mix.common.BaseActivity {
         Dummy.echo("getLibraries()");
         return new String[] {
             "gnustl_shared",
-            "example_app"
+            "example_00_empty"
         };
     }
 }
