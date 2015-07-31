@@ -10,6 +10,7 @@ namespace example
     public:
         TheApplication()
         {
+            setMainFrontendDesc (mix::FrontendDesc::descAuto);
         }
 
         ~TheApplication()
@@ -30,13 +31,13 @@ namespace example
         
         void update() override
         {
-            bgfx::setViewRect (0, 0, 0, getBackbufferWidth(), getBackbufferHeight());
+            bgfx::setViewRect (0, 0, 0, getMainFrontendDesc().width, getMainFrontendDesc().height);
 
-            float t = floorf (fmodf(getTimeSource().totalTimeInMS() * 0.25f, 256.0f));
+            float t = floorf (fmodf(getTimeSource().totalTimeInMS() * 0.0625f, 128.0f));
             
             bgfx::setViewClear (0
                 , BGFX_CLEAR_COLOR|BGFX_CLEAR_DEPTH
-                , (int (t) << 24) | 0x003030ff
+                , (int (t) << 16) | 0x300030ff
                 , 1.0f
                 , 0
                 );
