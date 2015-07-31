@@ -20,17 +20,17 @@ solution "mix_examples"
 		
 	end
 	
-	project ("example_00_empty")
+	project ("example_00")
 		mix_setup_common_app ()
 		
 		files {
-			path.join (PROJECT_DIR, "src/example_00_empty.cpp"),
+			path.join (PROJECT_DIR, "src/example_00/app.cpp"),
 		}
 			
 		if mix_is_ios() then
 			files {
-				path.join (PROJECT_DIR, "src/ios/info.plist"),
-				path.join (PROJECT_DIR, "src/ios/LaunchScreen.xib"),
+				path.join (PROJECT_DIR, "src/example_00/ios/info.plist"),
+				path.join (PROJECT_DIR, "src/common/ios/LaunchScreen.xib"),
 			}
 		end
 		
@@ -38,15 +38,15 @@ solution "mix_examples"
 			local grd = gradle()
 			grd.appabi = {"armeabi", "armeabi-v7a", "x86"}
 			
-			grd.manifest = path.join (PROJECT_DIR, "src/android/AndroidManifest.xml")
+			grd.manifest = path.join (PROJECT_DIR, "src/example_00/android/AndroidManifest.xml")
 			
 			grd.java_srcdirs = {
 				path.join (MIX_COMMON_DIR, "src/mix/android/app/java"),
-				path.join (PROJECT_DIR, "src/android/java")
+				path.join (PROJECT_DIR, "src/example_00/android/java")
 			}
 			
 			grd.res_srcdirs = {
-				path.join (PROJECT_DIR, "src/android/res")
+				path.join (PROJECT_DIR, "src/example_00/android/res")
 			}
 			
 			grd.plugins = {
@@ -69,6 +69,6 @@ solution "mix_examples"
 	
 	mix_common_tests_project()
 	
-	startproject ("example_00_empty")
+	startproject ("example_00")
 	
 	--defines ({"TEST_COMMON=1", "TEST_APP=1"})

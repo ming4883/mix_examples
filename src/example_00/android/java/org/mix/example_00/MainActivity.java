@@ -1,4 +1,4 @@
-package org.mix.example_app;
+package org.mix.example_00;
 
 import org.mix.dummy.Dummy;
 
@@ -9,7 +9,7 @@ public class MainActivity extends org.mix.common.BaseActivity {
         Dummy.echo("getLibraries()");
         return new String[] {
             "gnustl_shared",
-            "example_00_empty"
+            "example_00"
         };
     }
 }
