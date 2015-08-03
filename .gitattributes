@@ -10,3 +10,4 @@
 *.shader text eol=lf
 *.glsl text eof=lf
 *.hlsl text eof=lf
+*.sc text eof=lf

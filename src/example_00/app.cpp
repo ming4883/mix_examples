@@ -33,6 +33,8 @@ namespace example
         {
             bgfx::setViewRect (0, 0, 0, getMainFrontendDesc().width, getMainFrontendDesc().height);
 
+            bgfx::touch (0);
+
             float t = floorf (fmodf(getTimeSource().totalTimeInMS() * 0.0625f, 128.0f));
             
             bgfx::setViewClear (0
@@ -42,7 +44,6 @@ namespace example
                 , 0
                 );
 
-            bgfx::submit (0);
             bgfx::frame ();
         }
 

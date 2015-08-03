@@ -20,16 +20,20 @@ solution "mix_examples"
 		
 	end
 	
-	project ("example_00")
+	function add_example (example_name)
+		local example_dir = path.join (PROJECT_DIR, "src", example_name)
+		
+		project (example_name)
+		
 		mix_setup_common_app ()
 		
 		files {
-			path.join (PROJECT_DIR, "src/example_00/app.cpp"),
+			path.join (example_dir, "app.cpp"),
 		}
 			
 		if mix_is_ios() then
 			files {
-				path.join (PROJECT_DIR, "src/example_00/ios/info.plist"),
+				path.join (example_dir, "ios/info.plist"),
 				path.join (PROJECT_DIR, "src/common/ios/LaunchScreen.xib"),
 			}
 		end
@@ -38,16 +42,29 @@ solution "mix_examples"
 			local grd = gradle()
 			grd.appabi = {"armeabi", "armeabi-v7a", "x86"}
 			
-			grd.manifest = path.join (PROJECT_DIR, "src/example_00/android/AndroidManifest.xml")
+			grd.manifest = path.join (example_dir, "android/AndroidManifest.xml")
 			
 			grd.java_srcdirs = {
 				path.join (MIX_DIR, "src/mix/android/app/java"),
-				path.join (PROJECT_DIR, "src/example_00/android/java")
+				path.join (example_dir, "android/java")
 			}
 			
 			grd.res_srcdirs = {
-				path.join (PROJECT_DIR, "src/example_00/android/res")
+				path.join (example_dir, "android/res")
 			}
+			
+			grd.buildTypes.release.minifyEnabled = true
+			grd.buildTypes.release.proguardFiles = {
+				"getDefaultProguardFile('proguard-android.txt')"
+			}
+			
+			grd.multiDexEnabled = true
+		end
+	end
+	
+	add_example ("example_00")
+		if mix_is_android() then
+			local grd = gradle()
 			
 			grd.plugins = {
 				-- "io.fabric"
@@ -58,14 +75,10 @@ solution "mix_examples"
 			}
 			
 			grd.externalprojects["dummy"] = path.join (PROJECT_DIR, "vendor/dummy")
-			
-			grd.buildTypes.release.minifyEnabled = true
-			grd.buildTypes.release.proguardFiles = {
-				"getDefaultProguardFile('proguard-android.txt')"
-			}
-			
-			grd.multiDexEnabled = true
 		end
+		
+		
+	add_example ("example_01")
 	
 	mix_common_tests_project()
 	
