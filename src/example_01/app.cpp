@@ -43,6 +43,38 @@ namespace example
         };
 
         Triangle tri;
+        bgfx::ProgramHandle triProg;
+
+        bgfx::ProgramHandle loadProgram (const char* _vsPath, const char* _fsPath)
+        {
+            mix::Buffer _buf;
+
+            bgfx::ShaderHandle _vs, _fs;
+
+            {
+                mix::Result _ret = loadAsset (_buf, _vsPath);
+                if (_ret.isFail())
+                {
+                    mix::Log::e (getAppId(), "failed to load vs: %s", _ret.why());
+                    return BGFX_INVALID_HANDLE;
+                }
+
+                _vs = bgfx::createShader (bgfx::copy (_buf.ptr(), _buf.size()));
+            }
+
+            {
+                mix::Result _ret = loadAsset (_buf, _vsPath);
+                if (_ret.isFail())
+                {
+                    mix::Log::e (getAppId(), "failed to load vs: %s", _ret.why());
+                    return BGFX_INVALID_HANDLE;
+                }
+
+                _fs = bgfx::createShader (bgfx::copy (_buf.ptr(), _buf.size()));
+            }
+            
+            return bgfx::createProgram (_vs, _fs, true);
+        }
         
 
         TheApplication()
@@ -53,18 +85,26 @@ namespace example
         ~TheApplication()
         {
         }
+
+        const char* getAppId() const override
+        {
+            return "example_01";
+        }
         
         mix::Result init() override
         {
             bgfx::setDebug (BGFX_DEBUG_TEXT);
 
             tri.init();
+
+            triProg = loadProgram ("shader/triangle_vs_main.sb", "shader/triangle_fs_main.sb");
             
             return mix::Result::ok();
         }
         
         void shutdown() override
         {
+            bgfx::destroyProgram (triProg);
             tri.shutdown();
         }
         
@@ -73,7 +113,7 @@ namespace example
             bgfx::setViewRect (0, 0, 0, getMainFrontendDesc().width, getMainFrontendDesc().height);
             bgfx::touch (0);
 
-            float t = floorf (fmodf(getTimeSource().totalTimeInMS() * 0.0625f, 128.0f));
+            float t = floorf (fmodf (getTimeSource().totalTimeInMS() * 0.0625f, 128.0f));
             
             bgfx::setViewClear (0
                 , BGFX_CLEAR_COLOR|BGFX_CLEAR_DEPTH
@@ -82,9 +122,8 @@ namespace example
                 , 0
                 );
 
-
             bgfx::dbgTextClear();
-            bgfx::dbgTextPrintf(0, 1, 0x4f, "t = %.2f", t);
+            bgfx::dbgTextPrintf (0, 1, 0x4f, "t = %.2f", t);
             
             //bgfx::submit (0);
             bgfx::frame ();

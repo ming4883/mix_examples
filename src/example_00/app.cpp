@@ -16,6 +16,11 @@ namespace example
         ~TheApplication()
         {
         }
+
+        const char* getAppId() const override
+        {
+            return "example_00";
+        }
         
         mix::Result init() override
         {

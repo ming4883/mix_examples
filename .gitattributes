@@ -11,3 +11,4 @@
 *.glsl text eof=lf
 *.hlsl text eof=lf
 *.sc text eof=lf
+*.sh text eof=lf
