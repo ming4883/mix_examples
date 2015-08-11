@@ -1,5 +1,6 @@
 #include <mix/mix_application.h>
 #include <mix/mix_frontend.h>
+#include <mix/mix_asset.h>
 #include <bgfx.h>
 #include <math.h>
 
@@ -71,7 +72,7 @@ namespace example
             bgfx::ShaderHandle _vsh, _fsh;
 
             {
-                mix::Result _ret = loadAsset (_buf, _vsPath);
+                mix::Result _ret = mix::Asset::load (_buf, _vsPath);
                 if (_ret.isFail())
                 {
                     mix::Log::e (getAppId(), "failed to load vertex shader: %s", _ret.why());
@@ -82,7 +83,7 @@ namespace example
             }
 
             {
-                mix::Result _ret = loadAsset (_buf, _fsPath);
+                mix::Result _ret = mix::Asset::load (_buf, _fsPath);
                 if (_ret.isFail())
                 {
                     mix::Log::e (getAppId(), "failed to load fragment shader: %s", _ret.why());
@@ -132,7 +133,7 @@ namespace example
             bgfx::setViewRect (0, 0, 0, getMainFrontendDesc().width, getMainFrontendDesc().height);
             bgfx::touch (0);
 
-            float t = floorf (fmodf (getTimeSource().totalTimeInMS() * (1 / 128.0f), 128.0f));
+            float t = getTimeSource().totalTimeInMS() * (1 / 128.0f);
             
             bgfx::setViewClear (0
                 , BGFX_CLEAR_COLOR|BGFX_CLEAR_DEPTH
