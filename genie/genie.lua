@@ -80,7 +80,9 @@ solution "mix_examples"
 		
 	add_example ("example_01")
 	
-	mix_common_tests_project()
+	mix_add_zlib_project()
+	
+	mix_add_unit_tests_project()
 	
 	startproject ("example_00")
 	
