@@ -7,3 +7,6 @@ call compile_platform osx
 
 echo Packing ios/runtime.zip...
 "../../../mix/bin/cscs.exe" ../../../mix/src/devtool/Zip.cs ios/runtime.zip ios common
+
+echo Packing osx/runtime.zip...
+"../../../mix/bin/cscs.exe" ../../../mix/src/devtool/Zip.cs osx/runtime.zip osx common
