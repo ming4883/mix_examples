@@ -161,14 +161,10 @@ namespace example
             const mix::FrontendEvent* _tevt = _event->cast<mix::FrontendEvent>();
             if (nullptr != _tevt)
             {
-                if (_tevt->type == mix::FrontendEventType::Resized)
-                {
-                    mix::Log::i ("app", "Frontend Resized %d, %d", _tevt->params.size.w, _tevt->params.size.h);
-                    bgfx::reset (_tevt->params.size.w, _tevt->params.size.h, BGFX_RESET_NONE);
-                }
             }
         }
     };
+
     bgfx::VertexDecl TheApplication::Triangle::sharedVtxDecl;
     TheApplication* theApp = new TheApplication();
     

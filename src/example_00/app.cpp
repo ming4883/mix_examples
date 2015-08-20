@@ -59,10 +59,7 @@ namespace example
                 if (nullptr != _tevt)
                 {
                     if (_tevt->type == mix::FrontendEventType::Resized)
-                    {
                         mix::Log::i ("app", "Frontend Resized %d, %d", _tevt->params.size.w, _tevt->params.size.h);
-                        bgfx::reset (_tevt->params.size.w, _tevt->params.size.h, BGFX_RESET_NONE);
-                    }
 
                     if (_tevt->type == mix::FrontendEventType::Closed)
                          mix::Log::i ("app", "Frontend Closed");
