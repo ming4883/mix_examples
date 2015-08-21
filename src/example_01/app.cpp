@@ -102,7 +102,7 @@ namespace example
                     0xff3030ff,
                 };
 
-                int _gridclr[] = {
+                uint32_t _gridclr[] = {
                     0x00ffffff,
                     _baseclr[((int)_t) % 4],
                 };
