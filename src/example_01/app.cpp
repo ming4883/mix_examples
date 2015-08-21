@@ -62,7 +62,33 @@ namespace example
             }
         };
 
+        struct CheckerTexture
+        {
+            bgfx::TextureHandle tex;
+
+            CheckerTexture()
+            : tex (BGFX_INVALID_HANDLE)
+            {
+
+            }
+
+            void init()
+            {
+                tex = bgfx::createTexture2D (16u, 16u, 0u, bgfx::TextureFormat::RGBA8);
+                if (bgfx::invalidHandle == tex.idx)
+                {
+                    mix::Log::e("app", "failed to create CheckerTexture");
+                }
+            }
+
+            void shutdown()
+            {
+                bgfx::destroyTexture (tex);
+            }
+        };
+
         Triangle tri;
+        CheckerTexture checker;
         bgfx::ProgramHandle triProg;
 
         bgfx::ProgramHandle loadProgram (const char* _vsPath, const char* _fsPath)
@@ -116,6 +142,7 @@ namespace example
             bgfx::setDebug (BGFX_DEBUG_TEXT);
 
             tri.init();
+            checker.init();
 
             triProg = loadProgram ("shader/triangle_vs_main.sb", "shader/triangle_fs_main.sb");
             
@@ -126,6 +153,7 @@ namespace example
         {
             bgfx::destroyProgram (triProg);
             tri.shutdown();
+            checker.shutdown();
         }
         
         void update() override

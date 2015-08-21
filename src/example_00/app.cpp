@@ -36,15 +36,23 @@ namespace example
         
         void update() override
         {
-            bgfx::setViewRect (0, 0, 0, getMainFrontendDesc().width, getMainFrontendDesc().height);
+            // r, g, b, a
+            uint32_t _color[] = {
+                0xff3030ff,
+                0x30ff30ff,
+                0x3030ffff,
+                0xffffffff,
+            };
 
             bgfx::touch (0);
 
-            float t = floorf (fmodf(getTimeSource().totalTimeInMS() * 0.0625f, 128.0f));
-            
+            bgfx::setViewRect (0, 0, 0, getMainFrontendDesc().width, getMainFrontendDesc().height);
+
+            int _i = (int)floorf (getTimeSource().totalTimeInMS() / 2048) % 4;
+
             bgfx::setViewClear (0
                 , BGFX_CLEAR_COLOR|BGFX_CLEAR_DEPTH
-                , (int (t) << 16) | 0x300030ff
+                , _color[_i]
                 , 1.0f
                 , 0
                 );
