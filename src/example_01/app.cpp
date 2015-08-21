@@ -66,15 +66,19 @@ namespace example
         {
             bgfx::TextureHandle tex;
 
+            enum {
+                Size = 16u,
+            };
+
             CheckerTexture()
-            : tex (BGFX_INVALID_HANDLE)
+                : tex (BGFX_INVALID_HANDLE)
             {
 
             }
 
             void init()
             {
-                tex = bgfx::createTexture2D (16u, 16u, 0u, bgfx::TextureFormat::RGBA8);
+                tex = bgfx::createTexture2D (Size, Size, 0u, bgfx::TextureFormat::RGBA8);
                 if (bgfx::invalidHandle == tex.idx)
                 {
                     mix::Log::e("app", "failed to create CheckerTexture");
@@ -85,11 +89,43 @@ namespace example
             {
                 bgfx::destroyTexture (tex);
             }
+
+            void update (float _t)
+            {
+                static uint32_t _pixels[Size * Size];
+
+                // a, b, g, r
+                uint32_t _baseclr[] = {
+                    0xff303030,
+                    0xffff3030,
+                    0xff30ff30,
+                    0xff3030ff,
+                };
+
+                int _gridclr[] = {
+                    0x00ffffff,
+                    _baseclr[((int)_t) % 4],
+                };
+
+                for (int _r = 0; _r < Size; ++_r)
+                {
+                    int _y = _r / 4;
+
+                    for (int _c = 0; _c < Size; ++_c)
+                    {
+                        int _x = _c / 4;
+                        _pixels[_r * Size + _c] = _gridclr[(_y + _x) % 2];
+                    }
+                }
+
+                bgfx::updateTexture2D (tex, 0, 0, 0, Size, Size, bgfx::makeRef (_pixels, sizeof (_pixels)));
+            }
         };
 
         Triangle tri;
         CheckerTexture checker;
         bgfx::ProgramHandle triProg;
+        bgfx::UniformHandle texUni;
 
         bgfx::ProgramHandle loadProgram (const char* _vsPath, const char* _fsPath)
         {
@@ -144,13 +180,15 @@ namespace example
             tri.init();
             checker.init();
 
-            triProg = loadProgram ("shader/triangle_vs_main.sb", "shader/triangle_fs_main.sb");
+            triProg = loadProgram ("shader/displaytex_vs_main.sb", "shader/displaytex_fs_main.sb");
+            texUni = bgfx::createUniform ("s_tex", bgfx::UniformType::Int1);
             
             return mix::Result::ok();
         }
         
         void shutdown() override
         {
+            bgfx::destroyUniform (texUni);
             bgfx::destroyProgram (triProg);
             tri.shutdown();
             checker.shutdown();
@@ -161,11 +199,11 @@ namespace example
             bgfx::setViewRect (0, 0, 0, getMainFrontendDesc().width, getMainFrontendDesc().height);
             bgfx::touch (0);
 
-            float t = getTimeSource().totalTimeInMS() * (1 / 128.0f);
+            float t = getTimeSource().totalTimeInMS() * (1 / 256.0f);
             
             bgfx::setViewClear (0
                 , BGFX_CLEAR_COLOR|BGFX_CLEAR_DEPTH
-                , 0x303030ff
+                , 0x606060ff
                 , 1.0f
                 , 0
                 );
@@ -174,9 +212,11 @@ namespace example
             bgfx::dbgTextPrintf (0, 1, 0x4f, "t = %.2f", t);
 
             tri.update (t);
+            checker.update (t / 8.0f);
 
             bgfx::setVertexBuffer (tri.vtxbuf);
             bgfx::setIndexBuffer (tri.idxbuf);
+            bgfx::setTexture (0, texUni, checker.tex, BGFX_TEXTURE_MAG_POINT|BGFX_TEXTURE_MIN_POINT);
 
             bgfx::setState (BGFX_STATE_DEFAULT);
             
