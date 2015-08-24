@@ -79,7 +79,7 @@ namespace example
             void init()
             {
                 tex = bgfx::createTexture2D (Size, Size, 0u, bgfx::TextureFormat::RGBA8);
-                if (bgfx::invalidHandle == tex.idx)
+                if (!bgfx::isValid (tex))
                 {
                     mix::Log::e("app", "failed to create CheckerTexture");
                 }
@@ -126,38 +126,6 @@ namespace example
         CheckerTexture checker;
         bgfx::ProgramHandle triProg;
         bgfx::UniformHandle texUni;
-
-        bgfx::ProgramHandle loadProgram (const char* _vsPath, const char* _fsPath)
-        {
-            mix::Buffer _buf;
-
-            bgfx::ShaderHandle _vsh, _fsh;
-
-            {
-                mix::Result _ret = mix::Asset::load (_buf, _vsPath);
-                if (_ret.isFail())
-                {
-                    mix::Log::e (getAppId(), "failed to load vertex shader: %s", _ret.why());
-                    return BGFX_INVALID_HANDLE;
-                }
-
-                _vsh = bgfx::createShader (bgfx::copy (_buf.ptr(), _buf.size()));
-            }
-
-            {
-                mix::Result _ret = mix::Asset::load (_buf, _fsPath);
-                if (_ret.isFail())
-                {
-                    mix::Log::e (getAppId(), "failed to load fragment shader: %s", _ret.why());
-                    return BGFX_INVALID_HANDLE;
-                }
-
-                _fsh = bgfx::createShader (bgfx::copy (_buf.ptr(), _buf.size()));
-            }
-            
-            return bgfx::createProgram (_vsh, _fsh, true);
-        }
-        
 
         TheApplication()
         {
@@ -226,10 +194,7 @@ namespace example
 
         void handleEvent (const mix::Event* _event)
         {
-            const mix::FrontendEvent* _tevt = _event->cast<mix::FrontendEvent>();
-            if (nullptr != _tevt)
-            {
-            }
+            BX_UNUSED (_event);
         }
     };
 
