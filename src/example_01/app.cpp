@@ -1,7 +1,6 @@
 #include <mix/mix_application.h>
 #include <mix/mix_frontend.h>
-#include <mix/mix_asset.h>
-#include <bgfx.h>
+#include <mix/mix_shader.h>
 #include <math.h>
 
 namespace example
@@ -9,23 +8,24 @@ namespace example
     class TheApplication : public mix::Application
     {
     public:
-        struct Triangle
+        struct Quad
         {
             static bgfx::VertexDecl sharedVtxDecl;
 
             bgfx::DynamicVertexBufferHandle vtxbuf;
             bgfx::DynamicIndexBufferHandle idxbuf;
-            uint16_t idxmem[3];
-            float vtxmem[5*3];
+            uint16_t idxmem[6];
+            float vtxmem[5 * 4];
 
-            Triangle()
+            Quad()
                 : vtxbuf (BGFX_INVALID_HANDLE)
                 , idxbuf (BGFX_INVALID_HANDLE)
             {
             }
 
-            void init()
+            mix::Result init()
             {
+                
                 if (0 == sharedVtxDecl.getStride())
                 {
                     sharedVtxDecl.begin()
@@ -34,8 +34,23 @@ namespace example
                         .end();
                 }
 
-                vtxbuf = bgfx::createDynamicVertexBuffer (3, sharedVtxDecl, BGFX_BUFFER_NONE);
-                idxbuf = bgfx::createDynamicIndexBuffer (3, BGFX_BUFFER_NONE);
+                vtxbuf = bgfx::createDynamicVertexBuffer (bgfx::makeRef (vtxmem, sizeof (vtxmem)), sharedVtxDecl, BGFX_BUFFER_NONE);
+
+                if (!bgfx::isValid (vtxbuf))
+                    return mix::Result::fail ("failed to create vertex buffer");
+
+                idxbuf = bgfx::createDynamicIndexBuffer (bgfx::makeRef (idxmem, sizeof (idxmem)), BGFX_BUFFER_NONE);
+
+                if (!bgfx::isValid (idxbuf))
+                    return mix::Result::fail ("failed to create index buffer");
+
+                return mix::Result::ok();
+            }
+
+            void shutdown()
+            {
+                bgfx::destroyDynamicVertexBuffer (vtxbuf);
+                bgfx::destroyDynamicIndexBuffer (idxbuf);
             }
 
             void update (float _t)
@@ -43,22 +58,26 @@ namespace example
                 float _s = cosf (_t) * 0.5f + 0.5f;
                 _s = 0.25f + 0.75f * _s;
 
-                idxmem[0] = 0u;
-                idxmem[1] = 1u;
-                idxmem[2] = 2u;
+                int _i;
 
-                vtxmem[ 0] = 0.0f; vtxmem[ 1] = _s; vtxmem[ 2] = 0.5f; vtxmem[ 3] = 0.5f; vtxmem[ 4] = 1.0f;
-                vtxmem[ 5] =-_s; vtxmem[ 6] =-_s; vtxmem[ 7] = 0.5f; vtxmem[ 8] = 0.0f; vtxmem[ 9] = 0.0f;
-                vtxmem[10] = _s; vtxmem[11] =-_s; vtxmem[12] = 0.5f; vtxmem[13] = 1.0f; vtxmem[14] = 0.0f;
+                _i = 0;
+                idxmem[_i++] = 0u;
+                idxmem[_i++] = 1u;
+                idxmem[_i++] = 2u;
+
+                idxmem[_i++] = 3u;
+                idxmem[_i++] = 2u;
+                idxmem[_i++] = 1u;
+
+                _i = 0;
+                vtxmem[_i++] =-_s; vtxmem[_i++] = _s; vtxmem[_i++] = 0.5f; vtxmem[_i++] = 0.0f; vtxmem[_i++] = 1.0f;
+                vtxmem[_i++] =-_s; vtxmem[_i++] =-_s; vtxmem[_i++] = 0.5f; vtxmem[_i++] = 0.0f; vtxmem[_i++] = 0.0f;
+                vtxmem[_i++] = _s; vtxmem[_i++] = _s; vtxmem[_i++] = 0.5f; vtxmem[_i++] = 1.0f; vtxmem[_i++] = 1.0f;
+                vtxmem[_i++] = _s; vtxmem[_i++] =-_s; vtxmem[_i++] = 0.5f; vtxmem[_i++] = 1.0f; vtxmem[_i++] = 0.0f;
 
                 bgfx::updateDynamicVertexBuffer (vtxbuf, 0, bgfx::makeRef (vtxmem, sizeof (vtxmem)));
                 bgfx::updateDynamicIndexBuffer  (idxbuf, 0, bgfx::makeRef (idxmem, sizeof (idxmem)));
-            }
 
-            void shutdown()
-            {
-                bgfx::destroyDynamicVertexBuffer (vtxbuf);
-                bgfx::destroyDynamicIndexBuffer (idxbuf);
             }
         };
 
@@ -67,7 +86,7 @@ namespace example
             bgfx::TextureHandle tex;
 
             enum {
-                Size = 16u,
+                Size = 32u,
             };
 
             CheckerTexture()
@@ -76,13 +95,15 @@ namespace example
 
             }
 
-            void init()
+            mix::Result init()
             {
                 tex = bgfx::createTexture2D (Size, Size, 0u, bgfx::TextureFormat::RGBA8);
                 if (!bgfx::isValid (tex))
                 {
-                    mix::Log::e("app", "failed to create CheckerTexture");
+                    return mix::Result::fail ("failed to create CheckerTexture");
                 }
+
+                return mix::Result::ok();
             }
 
             void shutdown()
@@ -115,6 +136,8 @@ namespace example
                     {
                         int _x = _c / 4;
                         _pixels[_r * Size + _c] = _gridclr[(_y + _x) % 2];
+                        if (_y == 0 || _x == 0)
+                            _pixels[_r * Size + _c] = 0xff000000;
                     }
                 }
 
@@ -122,10 +145,31 @@ namespace example
             }
         };
 
-        Triangle tri;
-        CheckerTexture checker;
-        bgfx::ProgramHandle triProg;
-        bgfx::UniformHandle texUni;
+        struct UnlitTexShader
+        {
+            bgfx::ProgramHandle program;
+            bgfx::UniformHandle s_tex;
+
+            mix::Result init()
+            {
+                program = mix::Shader::loadFromAsset ("displaytex");
+                if (!bgfx::isValid (program))
+                    return mix::Result::fail ("failed to load program");
+
+                s_tex = bgfx::createUniform ("s_tex", bgfx::UniformType::Int1);
+                return mix::Result::ok();
+            }
+
+            void shutdown()
+            {
+                bgfx::destroyUniform (s_tex);
+                bgfx::destroyProgram (program);
+            }
+        };
+
+        Quad m_quad;
+        CheckerTexture m_tex;
+        UnlitTexShader m_shader;
 
         TheApplication()
         {
@@ -145,21 +189,18 @@ namespace example
         {
             bgfx::setDebug (BGFX_DEBUG_TEXT);
 
-            tri.init();
-            checker.init();
-
-            triProg = loadProgram ("shader/displaytex_vs_main.sb", "shader/displaytex_fs_main.sb");
-            texUni = bgfx::createUniform ("s_tex", bgfx::UniformType::Int1);
+            m_quad.init();
+            m_tex.init();
+            m_shader.init();
             
             return mix::Result::ok();
         }
         
         void shutdown() override
         {
-            bgfx::destroyUniform (texUni);
-            bgfx::destroyProgram (triProg);
-            tri.shutdown();
-            checker.shutdown();
+            m_shader.shutdown();
+            m_quad.shutdown();
+            m_tex.shutdown();
         }
         
         void update() override
@@ -167,28 +208,28 @@ namespace example
             bgfx::setViewRect (0, 0, 0, getMainFrontendDesc().width, getMainFrontendDesc().height);
             bgfx::touch (0);
 
-            float t = getTimeSource().totalTimeInMS() * (1 / 256.0f);
+            float _t = getTimeSource().totalTimeInMS() * (1 / 256.0f);
             
             bgfx::setViewClear (0
-                , BGFX_CLEAR_COLOR|BGFX_CLEAR_DEPTH
+                , BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH
                 , 0x606060ff
                 , 1.0f
                 , 0
                 );
 
             bgfx::dbgTextClear();
-            bgfx::dbgTextPrintf (0, 1, 0x4f, "t = %.2f", t);
+            bgfx::dbgTextPrintf (0, 1, 0x4f, "t = %.2f", _t);
 
-            tri.update (t);
-            checker.update (t / 8.0f);
+            m_quad.update (_t);
+            m_tex.update (_t / 8.0f);
 
-            bgfx::setVertexBuffer (tri.vtxbuf);
-            bgfx::setIndexBuffer (tri.idxbuf);
-            bgfx::setTexture (0, texUni, checker.tex, BGFX_TEXTURE_MAG_POINT|BGFX_TEXTURE_MIN_POINT);
+            bgfx::setVertexBuffer (m_quad.vtxbuf);
+            bgfx::setIndexBuffer (m_quad.idxbuf);
+            bgfx::setTexture (0, m_shader.s_tex, m_tex.tex, BGFX_TEXTURE_MAG_POINT|BGFX_TEXTURE_MIN_POINT);
 
             bgfx::setState (BGFX_STATE_DEFAULT);
             
-            bgfx::submit (0, triProg);
+            bgfx::submit (0, m_shader.program);
             bgfx::frame ();
         }
 
@@ -198,7 +239,7 @@ namespace example
         }
     };
 
-    bgfx::VertexDecl TheApplication::Triangle::sharedVtxDecl;
+    bgfx::VertexDecl TheApplication::Quad::sharedVtxDecl;
     TheApplication* theApp = new TheApplication();
     
 } // namespace example
