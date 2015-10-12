@@ -5,19 +5,13 @@ solution "mix_examples"
 	dofile (path.join (MIX_DIR, "genie/setup.lua"))
 	
 	if mix_is_android() then
-		premake.gradle.appabi = {"armeabi", "armeabi-v7a", "x86"}
-		
-		premake.gradle.buildscript.repositories = {
-			--"maven { url 'https://maven.fabric.io/public' }"
+		gradle.buildscript:repositories {
+			--"maven { url 'https://maven.fabric.io/public' }",
 		}
 		
-		premake.gradle.buildscript.dependencies = {
-			--"classpath 'io.fabric.tools:gradle:1.+'"
+		gradle.buildscript:dependencies {
+			--"classpath 'io.fabric.tools:gradle:1.+'",
 		}
-		
-		premake.gradle.ndk.ld_gold.enable = true
-		premake.gradle.ndk.ld_gold.multithread = true
-		
 	end
 	
 	function add_example (example_name)
@@ -30,7 +24,7 @@ solution "mix_examples"
 		files {
 			path.join (example_dir, "app.cpp"),
 		}
-			
+		
 		if mix_is_ios() then
 			files {
 				path.join (example_dir, "ios/info.plist"),
@@ -39,42 +33,41 @@ solution "mix_examples"
 		end
 		
 		if mix_is_android() then
-			local grd = gradle()
-			grd.appabi = {"armeabi", "armeabi-v7a", "x86"}
+			local grd_prj = gradle:project()
 			
-			grd.manifest = path.join (example_dir, "android/AndroidManifest.xml")
+			grd_prj.manifest = path.join (example_dir, "android/AndroidManifest.xml")
 			
-			grd.java_srcdirs = {
+			grd_prj.multiDexEnabled = true
+			
+			grd_prj:java_srcdirs {
 				path.join (MIX_DIR, "src/mix/android/app/java"),
 				path.join (example_dir, "android/java")
 			}
 			
-			grd.res_srcdirs = {
+			grd_prj:res_srcdirs {
 				path.join (example_dir, "android/res")
 			}
 			
-			grd.buildTypes.release.minifyEnabled = true
-			grd.buildTypes.release.proguardFiles = {
+			grd_prj:buildType("release").minifyEnabled = true
+			grd_prj:buildType("release").proguardFiles = {
 				"getDefaultProguardFile('proguard-android.txt')"
 			}
-			
-			grd.multiDexEnabled = true
 		end
 	end
 	
 	add_example ("example_00")
 		if mix_is_android() then
-			local grd = gradle()
+			local grd_prj = gradle:project()
 			
-			grd.plugins = {
+			grd_prj:plugins {
 				-- "io.fabric"
 			}
 			
-			grd.dependencies = {
+			grd_prj:dependencies {
 				"compile 'com.google.android.gms:play-services-games:7.3.0'"
 			}
 			
-			grd.externalprojects["dummy"] = path.join (PROJECT_DIR, "vendor/dummy")
+			grd_prj.externalprojects["dummy"] = path.join (PROJECT_DIR, "vendor/dummy")
 		end
 		
 		
