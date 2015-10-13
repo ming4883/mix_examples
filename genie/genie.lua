@@ -67,6 +67,10 @@ solution "mix_examples"
 				"compile 'com.google.android.gms:play-services-games:7.3.0'"
 			}
 			
+			grd_prj:extras {
+				"// this is a test grd_prj:extras()"
+			}
+			
 			grd_prj.externalprojects["dummy"] = path.join (PROJECT_DIR, "vendor/dummy")
 		end
 		
