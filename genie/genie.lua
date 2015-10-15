@@ -68,7 +68,11 @@ solution "mix_examples"
 			}
 			
 			grd_prj:extras {
-				"// this is a test grd_prj:extras()"
+				"// this line is a test grd_prj:extras()"
+			}
+			
+			grd_prj:ndk_extras {
+				"# this line is a test grd_prj:ndk_extras()"
 			}
 			
 			grd_prj.externalprojects["dummy"] = path.join (PROJECT_DIR, "vendor/dummy")

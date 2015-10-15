@@ -1,6 +1,6 @@
 #include <mix/mix_application.h>
 #include <mix/mix_frontend.h>
-#include <bgfx.h>
+#include <bgfx/bgfx.h>
 #include <math.h>
 
 namespace example
@@ -60,7 +60,7 @@ namespace example
             bgfx::frame ();
         }
 
-        void handleEvent (const mix::Event* _event)
+        void handleEvent (const mix::Event* _event) override
         {
             {
                 const mix::FrontendEvent* _tevt = _event->cast<mix::FrontendEvent>();

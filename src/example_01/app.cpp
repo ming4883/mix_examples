@@ -233,7 +233,7 @@ namespace example
             bgfx::frame ();
         }
 
-        void handleEvent (const mix::Event* _event)
+        void handleEvent (const mix::Event* _event) override
         {
             BX_UNUSED (_event);
         }
