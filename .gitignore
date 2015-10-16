@@ -1,4 +1,7 @@
 build/
+*xcscheme
+*xcuserstate
+xcschememanagement.plist
 debug.log
 *.iml
 ._*
