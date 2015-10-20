@@ -19,21 +19,39 @@ solution "mix_examples"
 		
 		project (example_name)
 		
-		mix_setup_common_app ()
-		
+		mix_setup_app()
+	
 		files {
+			path.join (MIX_DIR, "include/mix/*.h"),
+			path.join (MIX_DIR, "src/mix/*.cpp"),
 			path.join (example_dir, "app.cpp"),
 		}
 		
-		if mix_is_ios() then
-			files {
-				path.join (example_dir, "ios/info.plist"),
-				path.join (PROJECT_DIR, "src/common/ios/LaunchScreen.xib"),
-			}
+		excludes {
+			path.join (MIX_DIR, "src/mix/mix_tests*"),
+		}
+	
+		includedirs {
+			path.join (MIX_DIR, "include/"),
+		}
+	
+		links {
+			"bgfx_static",
+		}
+		
+		if mix_is_windows_desktop() then
+			defines { "MIX_WINDOWS_DESKTOP" }
 		end
 		
 		if mix_is_android() then
+			defines { "MIX_ANDROID" }
+		
 			local grd_prj = gradle:project()
+			
+			local asset_dir = path.join ("../runtime/", project().name, "android")
+			if os.isdir (asset_dir) then
+				grd_prj:assets_srcdirs {asset_dir}
+			end
 			
 			grd_prj.manifest = path.join (example_dir, "android/AndroidManifest.xml")
 			
@@ -53,6 +71,67 @@ solution "mix_examples"
 				"getDefaultProguardFile('proguard-android.txt')"
 			}
 		end
+		
+		local add_runtime_zip_file = function (platform)
+			local runtime_file = path.join ("../runtime/", project().name, platform, "runtime.zip");
+			if os.isfile (runtime_file) then
+				files {runtime_file}
+			end
+		end
+	
+		if mix_is_ios() then
+			files {
+				path.join (MIX_DIR, "src/mix/*ios.mm"),
+				path.join (example_dir, "ios/info.plist"),
+				path.join (PROJECT_DIR, "src/common/ios/LaunchScreen.xib"),
+			}
+			--local runtime_file = path.join ("../runtime/", project().name, "ios/runtime.zip");
+			--if os.isfile (runtime_file) then
+			--	files {runtime_file}
+			--end
+			add_runtime_zip_file ("ios")
+		
+			defines { "MIX_IOS" }
+		
+			buildoptions {
+				"-fobjc-arc"
+			}
+		end
+	
+		if mix_is_tvos() then
+			files {
+				path.join (MIX_DIR, "src/mix/*tvos.mm"),
+				path.join (example_dir, "tvos/info.plist"),
+			}
+			--local runtime_file = path.join ("../runtime/", project().name, "ios/runtime.zip");
+			--if os.isfile (runtime_file) then
+			--	files {runtime_file}
+			--end
+			add_runtime_zip_file ("ios")
+		
+			defines { "MIX_TVOS" }
+		
+			buildoptions {
+				"-fobjc-arc"
+			}
+		end
+	
+		if mix_is_osx() then
+			files { path.join (MIX_DIR, "src/mix/*osx.mm") }
+			--local runtime_file = path.join ("../runtime/", project().name, "osx/runtime.zip");
+			--if os.isfile (runtime_file) then
+			--	files {runtime_file}
+			--end
+			add_runtime_zip_file ("osx")
+			
+			defines { "MIX_OSX" }
+		
+			buildoptions {
+				"-fobjc-arc"
+			}
+		end
+	
+		mix_use_zlib()
 	end
 	
 	add_example ("example_00")
