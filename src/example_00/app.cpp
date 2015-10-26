@@ -83,6 +83,18 @@ namespace example
 
                     if (_tevt->type == mix::FrontendEventType::TouchCancel)
                          mix::Log::i ("app", "Frontend TouchCancel %d; %f, %f", _tevt->touchid, _tevt->params.location.x, _tevt->params.location.y);
+
+                    if (_tevt->type == mix::FrontendEventType::SwipeLeft)
+                        mix::Log::i ("app", "Frontend SwipeLeft %d; %f, %f", _tevt->touchid, _tevt->params.location.x, _tevt->params.location.y);
+
+                    if (_tevt->type == mix::FrontendEventType::SwipeRight)
+                        mix::Log::i ("app", "Frontend SwipeRight %d; %f, %f", _tevt->touchid, _tevt->params.location.x, _tevt->params.location.y);
+
+                    if (_tevt->type == mix::FrontendEventType::SwipeUp)
+                        mix::Log::i ("app", "Frontend SwipeUp %d; %f, %f", _tevt->touchid, _tevt->params.location.x, _tevt->params.location.y);
+
+                    if (_tevt->type == mix::FrontendEventType::SwipeDown)
+                        mix::Log::i ("app", "Frontend SwipeDown %d; %f, %f", _tevt->touchid, _tevt->params.location.x, _tevt->params.location.y);
                 }
             }
             {
