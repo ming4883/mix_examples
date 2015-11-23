@@ -160,6 +160,8 @@ solution "mix_examples"
 		
 	add_example ("example_01")
 	
+	add_example ("example_02")
+	
 	mix_add_zlib_project()
 	
 	mix_add_unit_tests_project()
