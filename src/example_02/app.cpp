@@ -1,6 +1,6 @@
 #include <mix/mix_application.h>
 #include <mix/mix_frontend.h>
-#include <mix/mix_shader.h>
+#include <mix/mix_rendering.h>
 #include <math.h>
 
 namespace example
